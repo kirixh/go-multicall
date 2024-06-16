@@ -8,7 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/forta-network/go-multicall/contracts/contract_multicall"
+	"github.com/kirixh/go-multicall/contracts/contract_multicall"
 )
 
 // DefaultAddress is the same for all chains (Multicall3).

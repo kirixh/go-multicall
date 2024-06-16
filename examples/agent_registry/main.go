@@ -7,7 +7,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/forta-network/go-multicall"
+	"github.com/kirixh/go-multicall"
 )
 
 const (
