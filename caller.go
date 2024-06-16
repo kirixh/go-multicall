@@ -69,6 +69,9 @@ func (caller *Caller) Call(opts *bind.CallOpts, calls ...*Call) ([]*Call, error)
 	for i, result := range results {
 		call := calls[i] // index always matches
 		call.Failed = !result.Success
+		if call.Failed && call.CanFail {
+			continue
+		}
 		if err := call.Unpack(result.ReturnData); err != nil {
 			return calls, fmt.Errorf("failed to unpack call outputs at index [%d]: %v", i, err)
 		}
