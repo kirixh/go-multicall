@@ -2,10 +2,9 @@ package multicall
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
 	"reflect"
 
+	"github.com/pkg/errors"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -32,7 +31,7 @@ func NewContract(rawJson, address string) (*Contract, error) {
 func ParseABI(rawJson string) (*abi.ABI, error) {
 	parsed, err := abi.JSON(bytes.NewBufferString(rawJson))
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse abi: %v", err)
+		return nil, errors.WithMessage(err, "failed to parse abi")
 	}
 	return &parsed, nil
 }
@@ -86,7 +85,7 @@ func (call *Call) Unpack(b []byte) error {
 
 	out, err := call.Contract.ABI.Unpack(call.Method, b)
 	if err != nil {
-		return fmt.Errorf("failed to unpack '%s' outputs: %v", call.Method, err)
+		return errors.WithMessagef(err, "failed to unpack '%s' outputs", call.Method)
 	}
 
 	fieldCount := t.NumField()
@@ -103,7 +102,7 @@ func (call *Call) Unpack(b []byte) error {
 func (call *Call) Pack() ([]byte, error) {
 	b, err := call.Contract.ABI.Pack(call.Method, call.Inputs...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to pack '%s' inputs: %v", call.Method, err)
+		return nil, errors.WithMessagef(err, "failed to pack '%s' inputs", call.Method)
 	}
 	return b, nil
 }

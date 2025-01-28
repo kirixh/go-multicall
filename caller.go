@@ -2,9 +2,9 @@ package multicall
 
 import (
 	"context"
-	"fmt"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -52,7 +52,7 @@ func (caller *Caller) Call(opts *bind.CallOpts, calls ...*Call) ([]*Call, error)
 	for i, call := range calls {
 		b, err := call.Pack()
 		if err != nil {
-			return calls, fmt.Errorf("failed to pack call inputs at index [%d]: %v", i, err)
+			return calls, errors.WithMessagef(err, "failed to pack call inputs at index [%d]", i)
 		}
 		multiCalls = append(multiCalls, contract_multicall.Multicall3Call3{
 			Target:       call.Contract.Address,
@@ -63,7 +63,7 @@ func (caller *Caller) Call(opts *bind.CallOpts, calls ...*Call) ([]*Call, error)
 
 	results, err := caller.contract.Aggregate3(opts, multiCalls)
 	if err != nil {
-		return calls, fmt.Errorf("multicall failed: %v", err)
+		return calls, errors.WithMessage(err, "multicall failed")
 	}
 
 	for i, result := range results {
@@ -73,7 +73,7 @@ func (caller *Caller) Call(opts *bind.CallOpts, calls ...*Call) ([]*Call, error)
 			continue
 		}
 		if err := call.Unpack(result.ReturnData); err != nil {
-			return calls, fmt.Errorf("failed to unpack call outputs at index [%d]: %v", i, err)
+			return calls, errors.WithMessagef(err, "failed to unpack call outputs at index [%d]", i)
 		}
 	}
 
@@ -91,7 +91,7 @@ func (caller *Caller) CallChunked(opts *bind.CallOpts, chunkSize int, cooldown t
 
 		chunk, err := caller.Call(opts, chunk...)
 		if err != nil {
-			return calls, fmt.Errorf("call chunk [%d] failed: %v", i, err)
+			return calls, errors.WithMessagef(err, "call chunk [%d] failed", i)
 		}
 		allCalls = append(allCalls, chunk...)
 	}
